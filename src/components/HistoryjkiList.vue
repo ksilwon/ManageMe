@@ -4,6 +4,7 @@ import type { Historyjka, StanHistoryjki } from '../types/historyjka'
 import { historyjkiApi } from '../api/historyjkiApi'
 import { currentUserService } from '../services/currentUserService'
 import HistoryjkaForm from './HistoryjkaForm.vue'
+import ZadaniaKanban from './ZadaniaKanban.vue'
 
 const props = defineProps<{
   projectId: string
@@ -13,6 +14,7 @@ const historyjki = ref<Historyjka[]>([])
 const loading = ref(true)
 const showForm = ref(false)
 const editingHistoryjka = ref<Historyjka | null>(null)
+const selectedHistoryjkaForKanban = ref<Historyjka | null>(null)
 const filterStan = ref<StanHistoryjki | 'all'>('all')
 
 const STANY: { value: StanHistoryjki | 'all'; label: string }[] = [
@@ -118,7 +120,14 @@ function priorytetLabel(p: string) {
 
 <template>
   <div class="historyjki-list">
-    <header class="header">
+    <ZadaniaKanban 
+      v-if="selectedHistoryjkaForKanban" 
+      :historyjka="selectedHistoryjkaForKanban" 
+      @close="selectedHistoryjkaForKanban = null"
+      @historyjka-updated="loadHistoryjki"
+    />
+    <div v-else class="historyjki-content">
+      <header class="header">
       <h2>Historyjki</h2>
       <div class="toolbar">
         <select v-model="filterStan" class="filter-select">
@@ -155,6 +164,7 @@ function priorytetLabel(p: string) {
                 <p v-if="h.opis" class="card-desc">{{ h.opis }}</p>
               </div>
               <div class="card-actions">
+                <button class="btn btn-icon" title="Zadania" @click="selectedHistoryjkaForKanban = h">📋</button>
                 <button class="btn btn-icon" title="Edytuj" @click="openEdit(h)">✎</button>
                 <button class="btn btn-icon btn-danger" title="Usuń" @click="remove(h)">✕</button>
               </div>
@@ -174,6 +184,7 @@ function priorytetLabel(p: string) {
                 <p v-if="h.opis" class="card-desc">{{ h.opis }}</p>
               </div>
               <div class="card-actions">
+                <button class="btn btn-icon" title="Zadania" @click="selectedHistoryjkaForKanban = h">📋</button>
                 <button class="btn btn-icon" title="Edytuj" @click="openEdit(h)">✎</button>
                 <button class="btn btn-icon btn-danger" title="Usuń" @click="remove(h)">✕</button>
               </div>
@@ -193,6 +204,7 @@ function priorytetLabel(p: string) {
                 <p v-if="h.opis" class="card-desc">{{ h.opis }}</p>
               </div>
               <div class="card-actions">
+                <button class="btn btn-icon" title="Zadania" @click="selectedHistoryjkaForKanban = h">📋</button>
                 <button class="btn btn-icon" title="Edytuj" @click="openEdit(h)">✎</button>
                 <button class="btn btn-icon btn-danger" title="Usuń" @click="remove(h)">✕</button>
               </div>
@@ -212,6 +224,7 @@ function priorytetLabel(p: string) {
               <p v-if="h.opis" class="card-desc">{{ h.opis }}</p>
             </div>
             <div class="card-actions">
+              <button class="btn btn-icon" title="Zadania" @click="selectedHistoryjkaForKanban = h">📋</button>
               <button class="btn btn-icon" title="Edytuj" @click="openEdit(h)">✎</button>
               <button class="btn btn-icon btn-danger" title="Usuń" @click="remove(h)">✕</button>
             </div>
@@ -225,6 +238,7 @@ function priorytetLabel(p: string) {
       :historyjka="editingHistoryjka"
       @submit="handleSubmit"
     />
+    </div>
   </div>
 </template>
 
